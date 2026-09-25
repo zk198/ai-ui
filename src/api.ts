@@ -30,6 +30,9 @@ export class RagApi {
 
   stats(): Promise<Stats> { return this.request<Stats>("/stats"); }
 
+  message(id: string): Promise<Record<string, unknown>> { return this.request<Record<string, unknown>>(`/messages/${encodeURIComponent(id)}`); }
+  document(id: string): Promise<Record<string, unknown>> { return this.request<Record<string, unknown>>(`/documents/${encodeURIComponent(id)}`); }
+
   upload(file: File, sourceName = "default"): Promise<Record<string, unknown>> {
     const form = new FormData();
     form.append("file", file);
