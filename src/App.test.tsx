@@ -1,8 +1,8 @@
-import {beforeEach,describe,expect,it,vi} from "vitest";
+import {afterEach,describe,expect,it,vi} from "vitest";
 import {render,screen,waitFor} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import App from "./App";
-beforeEach(()=>{localStorage.clear();vi.restoreAllMocks();});
+afterEach(()=>{localStorage.clear();vi.restoreAllMocks();});
 describe("App",()=>{
  it("shows local JWT login",()=>{render(<App/>);expect(screen.getByRole("heading",{name:"Private Knowledge"})).toBeInTheDocument();expect(screen.getByLabelText("Local access token")).toBeInTheDocument();});
  it("stores token and opens search",async()=>{const user=userEvent.setup();render(<App/>);await user.type(screen.getByLabelText("Local access token"),"local.jwt.token");await user.click(screen.getByRole("button",{name:"Continue"}));expect(localStorage.getItem("rag-ui.jwt")).toBe("local.jwt.token");expect(screen.getByRole("heading",{name:"What are you looking for?"})).toBeInTheDocument();});
