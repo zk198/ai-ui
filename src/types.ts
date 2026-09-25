@@ -1,5 +1,6 @@
 export type SearchResult = {
-  id: string;
+  id?: string;
+  chunk_id?: string | number;
   text: string;
   score?: number;
   source_name?: string;
@@ -8,6 +9,8 @@ export type SearchResult = {
   message_id?: string;
   document_id?: string;
   created_at?: string;
+  parent_kind?: "message" | "document";
+  parent?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
 };
 
