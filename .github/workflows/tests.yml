@@ -14,5 +14,15 @@ jobs:
           node-version: 22
       - run: npm install
       - run: npm test
+      - name: Dependency audit
+        run: npm audit --audit-level=high
       - run: npm run build
-      - run: docker build --build-arg VITE_API_BASE_URL=http://localhost:8000 .
+      - run: docker build --build-arg VITE_API_BASE_URL=http://localhost:8000 -t ai-ui:test .
+      - name: Verify container security headers
+        run: |
+          docker run -d --name ai-ui-security -p 18080:3000 ai-ui:test
+          trap 'docker rm -f ai-ui-security >/dev/null 2>&1 || true' EXIT
+          for i in $(seq 1 20); do curl -fsSI http://localhost:18080/ >/tmp/headers && break || sleep 1; done
+          grep -qi '^Content-Security-Policy:' /tmp/headers
+          grep -qi '^X-Content-Type-Options: nosniff' /tmp/headers
+          grep -qi '^X-Frame-Options: DENY' /tmp/headers
