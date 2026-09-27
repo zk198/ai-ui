@@ -8,7 +8,7 @@ describe("RagApi",()=>{
 
 it("streams grounded answer deltas and citations", async () => {
   const encoder=new TextEncoder();
-  const stream=new ReadableStream<Uint8Array>({start(controller){controller.enqueue(encoder.encode('event: delta\\ndata: {"content":"Hello "}\\n\\n'));controller.enqueue(encoder.encode('event: delta\\ndata: {"content":"world"}\\n\\n'));controller.enqueue(encoder.encode('event: done\\ndata: {"conversation_id":"c1","citations":[{"id":"S1","chunk_id":"chunk-1","source_name":"mailbox","text":"Evidence"}]}\\n\\n'));controller.close();}});
+  const stream=new ReadableStream<Uint8Array>({start(controller){controller.enqueue(encoder.encode('event: delta\ndata: {"content":"Hello "}\n\n'));controller.enqueue(encoder.encode('event: delta\ndata: {"content":"world"}\n\n'));controller.enqueue(encoder.encode('event: done\ndata: {"conversation_id":"c1","citations":[{"id":"S1","chunk_id":"chunk-1","source_name":"mailbox","text":"Evidence"}]}\n\n'));controller.close();}});
   vi.stubGlobal("fetch",vi.fn().mockResolvedValue(new Response(stream,{status:200})));
   const api=new RagApi("http://gateway","token"); const events=[]; for await(const event of api.streamAnswer("hello")) events.push(event);
   expect(events).toEqual([{type:"delta",content:"Hello "},{type:"delta",content:"world"},{type:"done",conversation_id:"c1",citations:[{id:"S1",chunk_id:"chunk-1",source_name:"mailbox",text:"Evidence"}]}]);
