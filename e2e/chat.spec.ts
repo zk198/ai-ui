@@ -15,8 +15,13 @@ test("streams grounded chat and renders citations", async ({ page }) => {
   });
 
   await page.goto("/");
-  await expect(page.getByRole("heading", {name: "Ask your knowledge base"})).toBeVisible();
+  const tokenInput = page.getByLabel("Local access token");
+  if (await tokenInput.isVisible()) {
+    await tokenInput.fill("test-token");
+    await page.getByRole("button", {name: "Continue"}).click();
+  }
 
+  await expect(page.getByRole("heading", {name: "Ask your knowledge base"})).toBeVisible();
   await page.getByLabel("Chat message").fill("What is important?");
   await page.getByRole("button", {name: "Send"}).click();
 
