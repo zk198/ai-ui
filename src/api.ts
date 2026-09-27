@@ -1,4 +1,4 @@
-import type { SearchResult, Source, Stats } from "./types";
+import type { AnswerCitation, AnswerStreamEvent, SearchResult, Source, Stats } from "./types";
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -40,3 +40,35 @@ export class RagApi {
     return this.request<Record<string, unknown>>("/upload", {method:"POST", body:form});
   }
 }
+
+  async *streamAnswer(question: string, conversationId?: string): AsyncGenerator<AnswerStreamEvent> {
+    const headers = new Headers({"Authorization": `Bearer ${this.token}`, "Content-Type": "application/json"});
+    const response = await fetch(`${this.baseUrl}/api/v1/answer/stream`, {
+      method: "POST", headers,
+      body: JSON.stringify({question, ...(conversationId ? {conversation_id: conversationId} : {})}),
+    });
+    if (!response.ok) {
+      const text = await response.text(); let detail = response.statusText;
+      try { const data = JSON.parse(text) as {detail?: unknown}; if (data.detail) detail = String(data.detail); } catch {}
+      throw new ApiError(response.status, detail || "Chat request failed");
+    }
+    if (!response.body) throw new ApiError(0, "Streaming is not supported by this browser");
+    const reader = response.body.getReader(); const decoder = new TextDecoder();
+    let buffer = ""; let event = "message"; let data = "";
+    const emit = async function* (): AsyncGenerator<AnswerStreamEvent> {
+      if (!data) return;
+      let payload: Record<string, unknown>;
+      try { payload = JSON.parse(data) as Record<string, unknown>; } catch { throw new ApiError(0, "Invalid streaming response"); }
+      if (event === "delta") yield {type:"delta", content:String(payload.content ?? "")};
+      else if (event === "done") yield {type:"done", conversation_id:String(payload.conversation_id ?? ""), citations:Array.isArray(payload.citations) ? payload.citations as AnswerCitation[] : []};
+      else if (event === "error") yield {type:"error", detail:String(payload.detail ?? "Chat request failed")};
+      event="message"; data="";
+    };
+    while(true){
+      const {value,done}=await reader.read(); buffer += decoder.decode(value ?? new Uint8Array(), {stream:!done});
+      const blocks=buffer.split("\n\n"); buffer=blocks.pop() ?? "";
+      for(const block of blocks){for(const line of block.split("\n")){if(line.startsWith("event: "))event=line.slice(7).trim();else if(line.startsWith("data: "))data+=line.slice(6);} yield* emit();}
+      if(done) break;
+    }
+    if(buffer.trim()){for(const line of buffer.split("\n")){if(line.startsWith("event: "))event=line.slice(7).trim();else if(line.startsWith("data: "))data+=line.slice(6);} yield* emit();}
+  }
