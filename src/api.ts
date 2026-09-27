@@ -1,4 +1,4 @@
-import type { AnswerCitation, AnswerStreamEvent, SearchResult, Source, Stats } from "./types";
+import type { AnswerCitation, AnswerStreamEvent, ExecutionTrace, OperationalStatus, SearchResult, Source, Stats } from "./types";
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -96,3 +96,12 @@ export class RagApi {
     }
   }
 }
+
+
+  trace(traceId: string): Promise<ExecutionTrace> {
+    return this.request<ExecutionTrace>(`/api/v1/traces/${encodeURIComponent(traceId)}`);
+  }
+
+  opsStatus(): Promise<OperationalStatus> {
+    return this.request<OperationalStatus>("/api/v1/ops/status");
+  }
