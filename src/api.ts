@@ -95,8 +95,6 @@ export class RagApi {
       yield* emit();
     }
   }
-}
-
 
   trace(traceId: string): Promise<ExecutionTrace> {
     return this.request<ExecutionTrace>(`/api/v1/traces/${encodeURIComponent(traceId)}`);
@@ -105,3 +103,4 @@ export class RagApi {
   opsStatus(): Promise<OperationalStatus> {
     return this.request<OperationalStatus>("/api/v1/ops/status");
   }
+}
