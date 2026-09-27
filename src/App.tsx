@@ -22,7 +22,7 @@ export default function App() {
   if(page==="chat") return <ChatPage api={api} onBack={()=>setPage("search")} onSources={()=>setPage("sources")} onLogout={logout} onOperations={()=>setPage("ops")}/>;
   if(page==="upload") return <UploadPage api={api} onBack={()=>setPage("search")}/>;
   if(page==="sources") return <SourcesPage api={api} onBack={()=>setPage("search")}/>;
-  if(page==="ops") return <ObservabilityPage api={api} onBack={()=>setPage("search")} onTrace={()=>setPage("trace")}/>;
+  if(page==="ops") return <ObservabilityPage api={api} onBack={()=>setPage("search")} onTrace={(id)=>{window.history.pushState({}, "", "?trace="+encodeURIComponent(id));setPage("trace")}}/>;
   if(page==="trace") return <TracePage api={api} traceId={new URLSearchParams(window.location.search).get("trace") || ""} onBack={()=>setPage("ops")}/>;
   if(page==="detail" && detail) return <DetailPage api={api} kind={detail.kind} id={detail.id} onBack={()=>setPage("search")}/>;
   return <SearchPage api={api} onLogout={logout} onUpload={()=>setPage("upload")} onSources={()=>setPage("sources")} onChat={()=>setPage("chat")} onDetail={(kind,id)=>{setDetail({kind,id});setPage("detail")}} onObservability={()=>setPage("ops")}/>;
