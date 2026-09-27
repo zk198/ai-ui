@@ -26,5 +26,5 @@ test("streams grounded chat and renders citations", async ({ page }) => {
 
   await expect(page.getByText("Hello world")).toBeVisible();
   await expect(page.getByText("[S1] mailbox")).toBeVisible();
-  await expect(page.getByText("Evidence")).toBeVisible();
+  await expect(page.getByText("Evidence", {exact: true})).toBeVisible();
 });
