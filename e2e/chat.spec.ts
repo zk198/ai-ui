@@ -17,7 +17,10 @@ test("streams grounded chat and renders citations", async ({ page }) => {
   });
 
   await page.goto("/");
+  await expect(page.getByRole("heading", {name: "What are you looking for?"})).toBeVisible();
+  await page.getByRole("button", {name: "Chat"}).click();
   await expect(page.getByRole("heading", {name: "Ask your knowledge base"})).toBeVisible();
+
   await page.getByLabel("Chat message").fill("What is important?");
   await page.getByRole("button", {name: "Send"}).click();
 
