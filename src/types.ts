@@ -28,7 +28,7 @@ export type Stats = Record<string, number | string | null>;
 export type AnswerCitation = {id:string;chunk_id:string;source_name:string;text:string};
 export type AnswerStreamEvent =
   | {type:"delta";content:string}
-  | {type:"done";conversation_id:string;citations:AnswerCitation[]}
+  | {type:"done";conversation_id:string;citations:AnswerCitation[];trace_id?:string}
   | {type:"error";detail:string};
 
 
