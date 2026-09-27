@@ -7,9 +7,12 @@ export class ApiError extends Error {
 export class RagApi {
   constructor(private baseUrl: string, private token: string) {}
 
+  private requestId(): string { return crypto.randomUUID(); }
+
   private async request<T>(path: string, init: RequestInit = {}): Promise<T> {
     const headers = new Headers(init.headers);
     headers.set("Authorization", `Bearer ${this.token}`);
+    headers.set("X-Request-ID", this.requestId());
     if (init.body && !headers.has("Content-Type")) headers.set("Content-Type", "application/json");
     const response = await fetch(`${this.baseUrl}${path}`, {...init, headers});
     const text = await response.text();
@@ -39,7 +42,7 @@ export class RagApi {
   }
 
   async *streamAnswer(question: string, conversationId?: string): AsyncGenerator<AnswerStreamEvent> {
-    const headers = new Headers({"Authorization": `Bearer ${this.token}`, "Content-Type": "application/json"});
+    const headers = new Headers({"Authorization": `Bearer ${this.token}`, "Content-Type": "application/json", "X-Request-ID": this.requestId()});
     const response = await fetch(`${this.baseUrl}/api/v1/answer/stream`, {
       method: "POST", headers,
       body: JSON.stringify({question, ...(conversationId ? {conversation_id: conversationId} : {})}),
