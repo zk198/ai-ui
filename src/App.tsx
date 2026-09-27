@@ -19,7 +19,7 @@ export default function App() {
   function login(value:string){saveToken(value);setToken(value);}
   function logout(){clearToken();setToken("");setPage("search");}
   if(!token) return <Login initialToken={PREFILLED_TOKEN} onLogin={login}/>;
-  if(page==="chat") return <ChatPage api={api} onBack={()=>setPage("search")} onSources={()=>setPage("sources")} onLogout={logout}/>;
+  if(page==="chat") return <ChatPage api={api} onBack={()=>setPage("search")} onSources={()=>setPage("sources")} onLogout={logout} onOperations={()=>setPage("ops")}/>;
   if(page==="upload") return <UploadPage api={api} onBack={()=>setPage("search")}/>;
   if(page==="sources") return <SourcesPage api={api} onBack={()=>setPage("search")}/>;
   if(page==="ops") return <ObservabilityPage api={api} onBack={()=>setPage("search")} onTrace={()=>setPage("trace")}/>;
