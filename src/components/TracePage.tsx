@@ -50,7 +50,7 @@ export function TracePage({api,traceId,onBack}:{api:RagApi;traceId:string;onBack
       <div><strong>{data.status}</strong><span>Status</span></div>
       <div><strong>{data.duration_ms ?? "—"} ms</strong><span>Duration</span></div>
       <div><strong>{data.trace.length}</strong><span>Events</span></div>
-      <div><strong>{data.metrics.trace_events ?? data.trace.length}</strong><span>Recorded</span></div>
+      <div><strong>{String(data.metrics.trace_events ?? data.trace.length)}</strong><span>Recorded</span></div>
     </section>
     <section className="detail-card trace-summary"><div className="detail-row"><span>Trace ID</span><strong>{data.trace_id}</strong></div><div className="detail-row"><span>Request ID</span><strong>{data.request_id ?? "—"}</strong></div><div className="detail-row"><span>Schema</span><strong>{data.schema_version}</strong></div>{data.error&&<div className="error banner">{JSON.stringify(data.error)}</div>}</section>
     <section className="trace-panel"><div className="section-head"><h2>Execution waterfall</h2><div className="trace-controls">
