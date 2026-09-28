@@ -1,17 +1,28 @@
-# rag-ui
+# AI Platform UI
 
-Private React + TypeScript + Vite UI for the RAG gateway.
+Private React + TypeScript + Vite UI for `ai-gateway`.
 
-## Phase 1.b
+## Phase 1
 
-The browser communicates only with rag-gateway. It supports local JWT login, retrieval search, and file upload. Internal PostgreSQL, Qdrant, ingestion, and retrieval services are never called directly.
+The browser communicates only with `ai-gateway`. It supports local JWT authentication, retrieval/search, file upload, grounded chat, streaming answers, conversation continuation, and citation/source navigation. Internal PostgreSQL, Qdrant, ingestion, retrieval, agent, tool, and LLM services are never called directly by the browser.
+
+The retrieval `/search` endpoint remains retrieval-only. Answer generation and agent orchestration are provided above that boundary by `ai-gateway` and `agent-core`.
 
 ## Local development
 
-Install Node.js 22+, then run npm install and npm run dev. Set VITE_API_BASE_URL to the gateway URL. A local JWT can be supplied through VITE_LOCAL_JWT_TOKEN or pasted into the login screen.
+Install Node.js 22+, then run:
 
-## Phase 1.c roadmap
+```bash
+npm install
+npm run dev
+```
 
-Out of scope for 1.b: OIDC identity integration; chat/RAG answer generation; evaluation and citation UX for generated answers; admin/user provisioning and RBAC; richer ingestion lifecycle and retry controls; email synchronization/connectors; document editing/annotation; advanced search controls and saved searches; observability/admin dashboards; production CSP/CSRF/token-rotation/deployment-secret hardening; performance/load testing and large-file upload strategy.
+Set `VITE_API_BASE_URL` to the `ai-gateway` URL. A local JWT can be supplied through `VITE_LOCAL_JWT_TOKEN` or pasted into the login screen.
 
-The retrieval search endpoint remains retrieval-only. Phase 1.c will evaluate a separate open-source chat/RAG orchestration library for answer generation and citations.
+## Observability
+
+The UI preserves request correlation IDs and exposes operations/diagnostic views through the authenticated gateway boundary. Privileged trace access is controlled by the gateway; the browser does not connect directly to internal services.
+
+## Deferred scope
+
+OIDC/enterprise identity, full RBAC, live Gmail/Outlook connectors, richer knowledge lifecycle management, advanced search controls, persistent production observability backends, production secret/token lifecycle, hostile-code sandboxing, and performance/load testing remain later-phase work.
