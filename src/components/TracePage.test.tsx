@@ -1,6 +1,7 @@
 import {describe,expect,it,vi} from "vitest";
 import {cleanup,render,screen,waitFor} from "@testing-library/react";
 import {TracePage} from "./TracePage";
+import {ApiError} from "../api";
 import type {ExecutionTrace} from "../types";
 
 const trace: ExecutionTrace={
@@ -21,13 +22,13 @@ describe("TracePage",()=>{
     render(<TracePage api={api} traceId="trace-1" onBack={vi.fn()}/>);
     await waitFor(()=>expect(screen.getByText("iteration.1")).toBeInTheDocument());
     expect(screen.getByText("CTO Diagnostics")).toBeInTheDocument();
-    expect(screen.getByText("1 of 2 events shown")).toBeInTheDocument();
+    expect(screen.getByText("2 of 2 events shown")).toBeInTheDocument();
     expect(screen.getByRole("button",{name:"Expand"})).toBeInTheDocument();
     expect(screen.getByText("Raw JSON")).toBeInTheDocument();
   });
 
   it("shows an explicit diagnostics authorization error",async()=>{
-    const api={trace:vi.fn().mockRejectedValue({status:403})} as never;
+    const api={trace:vi.fn().mockRejectedValue(new ApiError(403,"forbidden"))} as never;
     render(<TracePage api={api} traceId="trace-1" onBack={vi.fn()}/>);
     await waitFor(()=>expect(screen.getByRole("alert")).toHaveTextContent("diagnostics:read"));
   });
