@@ -1,4 +1,4 @@
-import {describe,expect,it,vi} from "vitest";
+import {afterEach,describe,expect,it,vi} from "vitest";
 import {cleanup,render,screen,waitFor} from "@testing-library/react";
 import {TracePage} from "./TracePage";
 import {ApiError} from "../api";
