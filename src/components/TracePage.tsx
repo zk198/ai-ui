@@ -32,7 +32,8 @@ export function TracePage({api,traceId,onBack}:{api:RagApi;traceId:string;onBack
     setError(e instanceof ApiError && e.status===403 ? "Diagnostics access denied (diagnostics:read required)." : e instanceof Error ? e.message : "Unable to load trace");
   });},[api,traceId]);
 
-  const visible=useMemo(()=>data?.trace.filter(e=>filter==="all"||e.kind===filter||e.stage===filter) ?? [],[data,filter]);
+  const layaEvents=useMemo(()=>data?.trace.filter(e=>e.kind==="system1"||e.stage==="laya") ?? [],[data]);
+  const visible=useMemo(()=>data?.trace.filter(e=>filter==="all"||e===undefined||e.kind===filter||e.stage===filter) ?? [],[data,filter]);
   const visibleIds=new Set(visible.map(e=>e.event_id));
   const depth=(event:TraceEvent)=>{
     let n=0; let parent=event.parent_id;
@@ -53,8 +54,25 @@ export function TracePage({api,traceId,onBack}:{api:RagApi;traceId:string;onBack
       <div><strong>{String(data.metrics.trace_events ?? data.trace.length)}</strong><span>Recorded</span></div>
     </section>
     <section className="detail-card trace-summary"><div className="detail-row"><span>Trace ID</span><strong>{data.trace_id}</strong></div><div className="detail-row"><span>Request ID</span><strong>{data.request_id ?? "—"}</strong></div><div className="detail-row"><span>Schema</span><strong>{data.schema_version}</strong></div>{data.error&&<div className="error banner">{JSON.stringify(data.error)}</div>}</section>
+    {layaEvents.length>0&&<section className="detail-card trace-summary">
+      <div className="section-head"><h2>Laya System-1</h2><span>{layaEvents.length} decision{layaEvents.length===1?"":"s"}</span></div>
+      {layaEvents.map(event=>{
+        const answers=event.payload?.answers;
+        const routing=event.payload?.routing;
+        const error=event.payload?.error;
+        const model=typeof routing==="object"&&routing!==null?String((routing as Record<string,unknown>).model ?? "—"):"—";
+        const errorText=error ? JSON.stringify(error) ?? "—" : null;
+        return <article key={event.event_id} className={event.status==="failed"?"trace-failed":""}>
+          <div className="detail-row"><span>Decision</span><strong>{typeof answers==="object"&&answers?JSON.stringify(answers) ?? "—":"—"}</strong></div>
+          <div className="detail-row"><span>Model</span><strong>{model}</strong></div>
+          <div className="detail-row"><span>Latency</span><strong>{event.duration_ms ?? "—"} ms</strong></div>
+          {errorText&&<div className="error banner">{errorText}</div>}
+          {event.status!=="completed"&&!error&&<div className="error banner">Laya {event.status}</div>}
+        </article>;
+      })}
+    </section>}
     <section className="trace-panel"><div className="section-head"><h2>Execution waterfall</h2><div className="trace-controls">
-      {["all","llm","tool","retrieval","agent"].map(value=><button key={value} className={filter===value?"":"ghost"} onClick={()=>setFilter(value)}>{value}</button>)}
+      {["all","llm","tool","retrieval","agent","system1"].map(value=><button key={value} className={filter===value?"":"ghost"} onClick={()=>setFilter(value)}>{value}</button>)}
       <button className="ghost" onClick={()=>setOpen(Object.fromEntries(visible.map(e=>[e.event_id,true])))}>Expand</button>
       <button className="ghost" onClick={()=>setOpen({})}>Collapse</button>
     </div></div>

@@ -24,6 +24,7 @@ describe("TracePage",()=>{
     expect(screen.getByText("CTO Diagnostics")).toBeInTheDocument();
     expect(screen.getByText(/2 of 2 events shown/)).toBeInTheDocument();
     expect(screen.getByRole("button",{name:"Expand"})).toBeInTheDocument();
+    expect(screen.getByRole("button",{name:"system1"})).toBeInTheDocument();
     expect(screen.getByText("Raw JSON")).toBeInTheDocument();
   });
 
