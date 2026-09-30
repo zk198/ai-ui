@@ -62,7 +62,7 @@ export function TracePage({api,traceId,onBack}:{api:RagApi;traceId:string;onBack
         const error=event.payload?.error;
         const model=typeof routing==="object"&&routing!==null?String((routing as Record<string,unknown>).model ?? "—"):"—";
         return <article key={event.event_id} className={event.status==="failed"?"trace-failed":""}>
-          <div className="detail-row"><span>Decision</span><strong>{typeof answers==="object"&&answers?JSON.stringify(answers):"—"}</strong></div>
+          <div className="detail-row"><span>Decision</span><strong>{typeof answers==="object"&&answers?JSON.stringify(answers) ?? "—":"—"}</strong></div>
           <div className="detail-row"><span>Model</span><strong>{model}</strong></div>
           <div className="detail-row"><span>Latency</span><strong>{event.duration_ms ?? "—"} ms</strong></div>
           {error&&<div className="error banner">{JSON.stringify(error)}</div>}
