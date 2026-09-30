@@ -10,7 +10,8 @@ const trace: ExecutionTrace={
   logs:[{level:"INFO",message:"done"}],metrics:{trace_events:2},
   trace:[
     {event_id:"agent",parent_id:null,sequence:1,kind:"agent",stage:"agent",name:"agent.run",status:"completed",started_at:"2026-09-28T05:00:00Z",duration_ms:1000,payload:{}},
-    {event_id:"llm",parent_id:"agent",sequence:2,kind:"llm",stage:"llm",name:"iteration.1",status:"completed",started_at:"2026-09-28T05:00:00Z",duration_ms:900,payload:{messages:[{role:"user",content:"hello"}]}}
+    {event_id:"llm",parent_id:"agent",sequence:2,kind:"llm",stage:"llm",name:"iteration.1",status:"completed",started_at:"2026-09-28T05:00:00Z",duration_ms:900,payload:{messages:[{role:"user",content:"hello"}]}},
+    {event_id:"laya",parent_id:"agent",sequence:3,kind:"system1",stage:"laya",name:"laya.systemone",status:"completed",started_at:"2026-09-28T05:00:00Z",duration_ms:42,payload:{answers:{request_type:{choice:"knowledge"}},routing:{model:"english"}}}
   ]
 };
 
@@ -25,6 +26,8 @@ describe("TracePage",()=>{
     expect(screen.getByText(/2 of 2 events shown/)).toBeInTheDocument();
     expect(screen.getByRole("button",{name:"Expand"})).toBeInTheDocument();
     expect(screen.getByText("Raw JSON")).toBeInTheDocument();
+    expect(screen.getByText("Laya System-1")).toBeInTheDocument();
+    expect(screen.getByText(/knowledge/)).toBeInTheDocument();
   });
 
   it("shows an explicit diagnostics authorization error",async()=>{
