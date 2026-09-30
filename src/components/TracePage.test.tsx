@@ -27,7 +27,7 @@ describe("TracePage",()=>{
     expect(screen.getByRole("button",{name:"Expand"})).toBeInTheDocument();
     expect(screen.getByText("Raw JSON")).toBeInTheDocument();
     expect(screen.getByText("Laya System-1")).toBeInTheDocument();
-    expect(screen.getByText(/knowledge/)).toBeInTheDocument();
+    expect(screen.getByText(/42 ms/)).toBeInTheDocument();
   });
 
   it("shows an explicit diagnostics authorization error",async()=>{
